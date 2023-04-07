@@ -26,7 +26,7 @@ const ComicsList = () => {
                 <ComicsListItem/>
                 <ComicsListItem/>
             </List>
-            <Button/>
+            <Button name='load more' className="button__main button__long"/>
         </Wrapper>
     )
 }
