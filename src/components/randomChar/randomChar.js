@@ -1,7 +1,10 @@
+import { Component } from 'react';
+import MarvelService from '../../services/MarvelService';
 import styled from 'styled-components';
+
 import Button from "../button/button";
-import thor from "../../resources/img/thor.jpg";
 import mjolnir from "../../resources/img/mjolnir.png";
+
 
 const Wrapper = styled.div`
     display: flex;
@@ -40,6 +43,8 @@ const InfoWrapper = styled.div`
 const ButtonWrapper = styled.div`
     display: flex;
     justify-content: space-between;
+    margin-top: auto;
+    width: 232px;
 `;
 
 const TryBlock = styled.div`
@@ -67,17 +72,45 @@ const TryBlock = styled.div`
     }
 `;
 
-const RandomChar = () => {
+class RandomChar extends Component {
+    constructor(props) { // Создаем конструктор для запуска updateChar сразу при создании обьекта
+        super(props);
+        this.updateChar(); // вызываем updateChar() сразу при создании обьекта (ЛУЧШЕ ТАК НЕ ДЕЛАТЬ)
+    }
+
+    state = { // Формируем обьект с нулевыми значениями, для последующего его изменения, так как нам не надо хранить его предыдущие данные то создаем его вне конструктора
+        char: {} // Пустой обьект персонажа куда запишем пришедшие данные с сервера
+    }
+
+    marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
+
+    onCharLoaded = (char) => {
+        this.setState({char}); // В обьект state записываем данные из обьекта char
+    }
+
+    updateChar = () => { // Функция получения данных с сервера
+        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // Получаем случайное id для формирования обьекта персонажа
+
+        this.marvelService
+            .getCharacter(id) // Метод получение данных персонажа по id
+            .then(this.onCharLoaded); // Вызываем метод для записи обьекта персонажа с сервера в обьект state
+    }
+
+  
+   render () {
+
+    const {char: {name, description, thumbnail, homepage, wiki}} = this.state;
+
     return (
         <Wrapper>
             <InfoBlock>
-                <img src={thor} alt="" />
+                <img src={thumbnail} alt="Random character" />
                 <InfoWrapper>
-                    <h2>thor</h2>
-                    <p>As the Norse God of thunder and lightning, Thor wields one of the greatest weapons ever made, the enchanted hammer Mjolnir. While others have described Thor as an over-muscled, oafish imbecile, he's quite smart and compassionate...</p>
+                    <h2>{name}</h2>
+                    <p>{description}</p>
                     <ButtonWrapper>
-                        <Button className="button__main" name='homepage'/>
-                        <Button className="button__secondary" name='wiki'/>
+                        <Button url={homepage} className="button__main" name='homepage'/>
+                        <Button url={wiki} className="button__secondary" name='wiki'/>
                     </ButtonWrapper>
                 </InfoWrapper>
             </InfoBlock>
@@ -92,6 +125,7 @@ const RandomChar = () => {
             </TryBlock>
         </Wrapper>
     )
+   }
 }
 
 export default RandomChar;

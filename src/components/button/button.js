@@ -1,8 +1,8 @@
 const Button = (props) => {
-    const {name} = props;
+    const {name, url} = props;
     return (
         <div>
-            <a href="#" className={"button " + props.className}>
+            <a href={url} className={"button " + props.className}>
                 <div className="inner">{name}</div>
             </a>
         </div>
