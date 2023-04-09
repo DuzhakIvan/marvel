@@ -4,10 +4,13 @@ import styled from 'styled-components';
 
 import Button from "../button/button";
 import mjolnir from "../../resources/img/mjolnir.png";
+import Spinner from '../spinner/spinner.js';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 
 
 const Wrapper = styled.div`
     display: flex;
+    align-items: center;
 `;
 
 const InfoBlock = styled.div`
@@ -79,13 +82,25 @@ class RandomChar extends Component {
     }
 
     state = { // Формируем обьект с нулевыми значениями, для последующего его изменения, так как нам не надо хранить его предыдущие данные то создаем его вне конструктора
-        char: {} // Пустой обьект персонажа куда запишем пришедшие данные с сервера
+        char: {}, // Пустой обьект персонажа куда запишем пришедшие данные с сервера
+        loading: true, // Переменная для отслеживания состояния загрузки для спиннера
+        error: false // состояние ошибки
     }
 
     marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
 
     onCharLoaded = (char) => {
-        this.setState({char}); // В обьект state записываем данные из обьекта char
+        this.setState({
+            char,   // В обьект state записываем данные из обьекта char
+            loading: false // Меняем значение состояния загрузки персонажей с сервера
+        }); 
+    }
+
+    onError = () => {
+        this.setState({
+            loading: false,
+            error: true
+        })
     }
 
     updateChar = () => { // Функция получения данных с сервера
@@ -93,27 +108,27 @@ class RandomChar extends Component {
 
         this.marvelService
             .getCharacter(id) // Метод получение данных персонажа по id
-            .then(this.onCharLoaded); // Вызываем метод для записи обьекта персонажа с сервера в обьект state
+            .then(this.onCharLoaded) // Вызываем метод для записи обьекта персонажа с сервера в обьект state
+            .catch(this.onError); 
     }
 
-  
+    
+
    render () {
 
-    const {char: {name, description, thumbnail, homepage, wiki}} = this.state;
+    const {char, loading, error} = this.state;
+    const errorMessage = error ? <ErrorMessage/> : null; // Если error TRUE вернет компонент, нет - null
+    const spinner = loading ? <Spinner/> : null; // Если loading TRUE вернет компонент, нет - null
+    const content = !(loading || error) ? <View char={char}/> : null; // Если loading или error НЕ TRUE вернет компонент, нет - null
+
 
     return (
         <Wrapper>
-            <InfoBlock>
-                <img src={thumbnail} alt="Random character" />
-                <InfoWrapper>
-                    <h2>{name}</h2>
-                    <p>{description}</p>
-                    <ButtonWrapper>
-                        <Button url={homepage} className="button__main" name='homepage'/>
-                        <Button url={wiki} className="button__secondary" name='wiki'/>
-                    </ButtonWrapper>
-                </InfoWrapper>
-            </InfoBlock>
+            {/*loading ? <Spinner/> : <View char={char}/> /* Если состояние загрузки ТРУ загрузится вернет Спиннер, ФОЛС - компонент  View */}
+
+            {errorMessage /* Если не null отобразит компонент */}
+            {spinner /* Если не null отобразит компонент */}
+            {content /* Если не null отобразит компонент */}
             <TryBlock>
                 <p>Random character for today!<br/>
                    Do you want to get to know him better?
@@ -126,6 +141,24 @@ class RandomChar extends Component {
         </Wrapper>
     )
    }
+}
+
+// Отдкельный компонент
+const View = ({char}) => {
+    const {name, description, thumbnail, homepage, wiki} = char;
+    return (
+        <InfoBlock>
+            <img src={thumbnail} alt="Random character" />
+            <InfoWrapper>
+                <h2>{name}</h2>
+                <p>{description}</p>
+                <ButtonWrapper>
+                    <Button url={homepage} className="button__main" name='homepage'/>
+                    <Button url={wiki} className="button__secondary" name='wiki'/>
+                </ButtonWrapper>
+            </InfoWrapper>
+        </InfoBlock>
+    )
 }
 
 export default RandomChar;
