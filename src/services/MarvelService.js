@@ -1,7 +1,7 @@
 class MarvelService {
     // _ - значение свойства которое дает понять что его  не надо изменять
     _apiBase = 'https://gateway.marvel.com:443/v1/public/'; // База адресса запроса (для сохранения принципа dont repeat your self)
-    _apiKey='apikey=b5fd0bed3b38fddcc8ec498949b311c0'; // Наш ключ запроса (для сохранения принципа dont repeat your self)
+    _apiKey='apikey=b5fd0bed3b38fddcc8ec498949b311c00'; // Наш ключ запроса (для сохранения принципа dont repeat your self)
 
     getResource =  async (url) => { // Ассинхронная функция запроса "ресурсов" по заданному url
         let res= await fetch(url); // В res записываем = запрос данных через fetch, ожидаем ответ await

@@ -1,4 +1,8 @@
 import styled from "styled-components";
+import { Component } from "react";
+import MarvelService from '../../services/MarvelService';
+import Spinner from "../spinner/spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
 
 import abyss from "../../resources/img/abyss.jpg";
 import CharInfo from "../charInfo/charInfo";
@@ -50,54 +54,87 @@ const ListWrapper = styled.div`
     grid-row: 1 / -1;
 `;
 
-const CharList = () => {
-    return (
-        <Wrapper>
-            <ListWrapper>
-                <List>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item active='true'>
-                        <img src={abyss} alt=""/>
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                    <Item>
-                        <img src={abyss} alt="" />
-                        <div>Abyss</div>
-                    </Item>
-                </List>
-                <Button className='button__main' name="load more"/>
-            </ListWrapper>
-            <CharInfo/>
-            <CharSearch/>
-        </Wrapper>
-    )
+class CharList extends Component {
+    state = {
+        charList: [],
+        loading: true,
+        error: false,
+    }
+
+    marvelService = new MarvelService();
+
+    componentDidMount() {
+        this.marvelService.getAllCharacters()
+            .then(this.onCharListLoaded)
+            .catch(this.onError);
+
+        
+    }
+
+    onCharListLoaded = (charList) => {
+        this.setState({
+            charList,
+            loading: false
+        })
+    }
+
+    onError = () => {
+        this.setState({
+            error: true,
+            loading: false
+        })
+    }
+
+
+    renderItems(arr) {
+        const items = arr.map((item => {
+            let imgStyle = {'objectFit' : 'cover'};
+            if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
+                imgStyle = {'objectFit' : 'unset'};  
+        }
+
+        return (
+            <Item>
+                <img src={item.thumbnail} alt={item.name} style={imgStyle} />
+                <div>{item.name}</div>
+            </Item>
+        )
+
+        }));
+
+        return (
+            <List>
+                {items}
+            </List>
+        )
+    }
+
+
+
+    render () {
+
+        const {charList, loading, error} = this.state;
+        const items = this.renderItems(charList);
+
+        const errorMessage = error ? <ErrorMessage/> : null;
+        const spinner = loading ? <Spinner/> : null;
+        const content = !(loading || error) ? items : null;
+
+        return (
+            <Wrapper>
+                <ListWrapper>
+                    <List>
+                        {errorMessage}
+                        {spinner}
+                        {content}
+                    </List>
+                    <Button className='button__main' name="load more"/>
+                </ListWrapper>
+                <CharInfo/>
+                <CharSearch/>
+            </Wrapper>
+        )
+    }
 }
 
 export default CharList;

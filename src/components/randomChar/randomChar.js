@@ -10,7 +10,6 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 const Wrapper = styled.div`
     display: flex;
-    align-items: center;
 `;
 
 const InfoBlock = styled.div`
@@ -23,7 +22,7 @@ const InfoBlock = styled.div`
         margin-right: 30px;
         width: 180px;
         height: 180px;
-        object-fit: cover;
+        object-fit: 'cover';
     }  
 `;
 
@@ -76,15 +75,14 @@ const TryBlock = styled.div`
 `;
 
 class RandomChar extends Component {
-    constructor(props) { // Создаем конструктор для запуска updateChar сразу при создании обьекта
-        super(props);
-        this.updateChar(); // вызываем updateChar() сразу при создании обьекта (ЛУЧШЕ ТАК НЕ ДЕЛАТЬ)
-    }
-
     state = { // Формируем обьект с нулевыми значениями, для последующего его изменения, так как нам не надо хранить его предыдущие данные то создаем его вне конструктора
         char: {}, // Пустой обьект персонажа куда запишем пришедшие данные с сервера
         loading: true, // Переменная для отслеживания состояния загрузки для спиннера
         error: false // состояние ошибки
+    }
+
+    componentDidMount() {
+        this.updateChar();
     }
 
     marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
@@ -135,7 +133,9 @@ class RandomChar extends Component {
                 </p>
                 <br/>
                 <p>Or choose another one</p>
-                <Button className="button__main" name='try it'/>
+                <button onClick={this.updateChar} className="button button__main">
+                    <div className="inner">try it</div>
+                </button>
                 <img src={mjolnir} alt=""/>
             </TryBlock>
         </Wrapper>
@@ -146,9 +146,11 @@ class RandomChar extends Component {
 // Отдкельный компонент
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
+    const style = thumbnail == 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? {objectFit: 'contain'} : {objectFit: 'cover'};
+
     return (
         <InfoBlock>
-            <img src={thumbnail} alt="Random character" />
+            <img src={thumbnail} alt="Random character" style={{style}} />
             <InfoWrapper>
                 <h2>{name}</h2>
                 <p>{description}</p>
