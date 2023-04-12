@@ -4,7 +4,8 @@ import MarvelService from '../../services/MarvelService';
 import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 
-import abyss from "../../resources/img/abyss.jpg";
+
+import './charList.scss';
 import CharInfo from "../charInfo/charInfo";
 import CharSearch from "../charSearch/charSearch";
 import Button from "../button/button";
@@ -25,26 +26,6 @@ const List = styled.div`
     grid-template-columns: repeat(3, 200px);
 `;
 
-const Item = styled.li`
-    width: 200px;
-    height: 318px;
-    background-color: #232222;
-    box-shadow: ${props => props.active ? '0 5px 20px #9F0013' : '5px 5px 10px rgba(0, 0, 0, .25)'};
-    transform: ${props =>  props.active ? "translateY(-8px)" : 'translateY(0px)'};
-
-    img{
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-    }
-
-    div{
-        padding: 15px;
-        color: #FFF;
-        font-size: 22px;
-        font-weight: 700;
-    }
-`;
 
 const ListWrapper = styled.div`
     display: flex;
@@ -59,6 +40,13 @@ class CharList extends Component {
         charList: [],
         loading: true,
         error: false,
+        selectedChar: null
+    }
+
+    onCharSelected = (id) => {
+        this.setState({
+            selectedChar: id
+        })
     }
 
     marvelService = new MarvelService();
@@ -94,12 +82,14 @@ class CharList extends Component {
         }
 
         return (
-            <Item>
+            <li 
+                className='char__item' 
+                key={item.id}
+                onClick={() => this.onCharSelected(item.id)}>
                 <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-                <div>{item.name}</div>
-            </Item>
+                <div className='char__name'>{item.name}</div>
+            </li>
         )
-
         }));
 
         return (
@@ -130,7 +120,7 @@ class CharList extends Component {
                     </List>
                     <Button className='button__main' name="load more"/>
                 </ListWrapper>
-                <CharInfo/>
+                <CharInfo charId = {this.state.selectedChar}/>
                 <CharSearch/>
             </Wrapper>
         )

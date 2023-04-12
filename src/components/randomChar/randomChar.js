@@ -94,6 +94,12 @@ class RandomChar extends Component {
         }); 
     }
 
+    onCharLoading = () => {
+        this.setState({
+            loading: true
+        })
+    }
+
     onError = () => {
         this.setState({
             loading: false,
@@ -103,6 +109,7 @@ class RandomChar extends Component {
 
     updateChar = () => { // Функция получения данных с сервера
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // Получаем случайное id для формирования обьекта персонажа
+        this.onCharLoading(); // Когда обновляется случайный персонаж, перед запросом на сервер
 
         this.marvelService
             .getCharacter(id) // Метод получение данных персонажа по id
@@ -143,10 +150,10 @@ class RandomChar extends Component {
    }
 }
 
-// Отдкельный компонент
+// Отдельный компонент
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
-    const style = thumbnail == 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? {objectFit: 'contain'} : {objectFit: 'cover'};
+    const style = thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? {objectFit: 'contain'} : {objectFit: 'cover'};
 
     return (
         <InfoBlock>

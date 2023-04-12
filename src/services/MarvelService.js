@@ -1,7 +1,7 @@
 class MarvelService {
     // _ - значение свойства которое дает понять что его  не надо изменять
     _apiBase = 'https://gateway.marvel.com:443/v1/public/'; // База адресса запроса (для сохранения принципа dont repeat your self)
-    _apiKey='apikey=b5fd0bed3b38fddcc8ec498949b311c00'; // Наш ключ запроса (для сохранения принципа dont repeat your self)
+    _apiKey='apikey=b5fd0bed3b38fddcc8ec498949b311c0'; // Наш ключ запроса (для сохранения принципа dont repeat your self)
 
     getResource =  async (url) => { // Ассинхронная функция запроса "ресурсов" по заданному url
         let res= await fetch(url); // В res записываем = запрос данных через fetch, ожидаем ответ await
@@ -29,8 +29,9 @@ class MarvelService {
 
     _transformCharacter = (char) => { // в аргумент передадим путь нужным данным в обьекте
         return {
+            id: char.id, // Айди важный параметр для работы, передаем потом в качестве пропсов компонентам
             name: char.name, // Чтобы формировать обьект необходимо знать структуру полученных данных
-            description: char.description,
+            description: (char.description ? char.description : "No description for this hero("),
             thumbnail: char.thumbnail.path + '.' + char.thumbnail.extension, // картинка =  url + расширение
             /* Пример кгде хранится url
             "urls": [
@@ -45,6 +46,7 @@ class MarvelService {
             */
             homepage: char.urls[0].url, // ссылка 
             wiki: char.urls[1].url, // ссылка
+            comics: char.comics.items            
         }
     }
 }
