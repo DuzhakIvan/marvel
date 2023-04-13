@@ -122,9 +122,9 @@ class RandomChar extends Component {
    render () {
 
     const {char, loading, error} = this.state;
-    const errorMessage = error ? <ErrorMessage/> : null; // Если error TRUE вернет компонент, нет - null
-    const spinner = loading ? <Spinner/> : null; // Если loading TRUE вернет компонент, нет - null
-    const content = !(loading || error) ? <View char={char}/> : null; // Если loading или error НЕ TRUE вернет компонент, нет - null
+    const errorMessage = error ? <ErrorMessage/> : null;
+    const spinner = loading ? <Spinner/> : null;
+    const content = !(loading || error) ? <View char={char}/> : null;
 
 
     return (

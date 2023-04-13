@@ -5,6 +5,7 @@ import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Skeleton from "../skeleton/Skeleton";
 
+
 import Button from "../button/button";
 
 const BigWrapper = styled.div`
@@ -120,13 +121,15 @@ class CharInfo extends Component {
             .getCharacter(charId) // запрашиваем данные по ID обьекта
             .then(this.onCharLoaded) // Полученные данные с сервера (promise) передаем в функцию 
             .catch(this.onError); // в случае ошибки вызываем функцию onError и передаем туда данные об ошибке
+
+        this.foo.bar = 0; // Специально обращаемся к несушествующему свойству для вызова ошибки
     };
 
     render() {
         const { char, loading, error } = this.state;
 
         const skeleton = char || loading || error ? null : <Skeleton />; // Если обьект создан или состояние загрузки, или ошибки - игнорируем / равно <Sceleton/> компоненту
-        const errorMessage = error ? <ErrorMessage /> : null; // если состояние error - равен компоненту <ErrorMessage/> / равен ничему
+        const errorMessage = error ? <ErrorMessage/> : null; // если состояние error - равен компоненту <ErrorMessage/> / равен ничему
         const spinner = loading ? <Spinner /> : null; // если состояние загрузки - равен <Spinner/> / равен ничему
         const content = !(loading || error || !char) ? ( // если не (состояние загрузки / ошибка / обьект создан)
             <View char={char} />

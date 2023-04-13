@@ -3,7 +3,7 @@ import { Component } from "react";
 import MarvelService from '../../services/MarvelService';
 import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-
+import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import './charList.scss';
 import CharInfo from "../charInfo/charInfo";
@@ -120,7 +120,9 @@ class CharList extends Component {
                     </List>
                     <Button className='button__main' name="load more"/>
                 </ListWrapper>
-                <CharInfo charId = {this.state.selectedChar}/>
+                <ErrorBoundary>
+                    <CharInfo charId = {this.state.selectedChar}/>
+                </ErrorBoundary>
                 <CharSearch/>
             </Wrapper>
         )
