@@ -5,7 +5,6 @@ import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Skeleton from "../skeleton/Skeleton";
 
-
 import Button from "../button/button";
 
 const BigWrapper = styled.div`
@@ -122,7 +121,7 @@ class CharInfo extends Component {
             .then(this.onCharLoaded) // Полученные данные с сервера (promise) передаем в функцию 
             .catch(this.onError); // в случае ошибки вызываем функцию onError и передаем туда данные об ошибке
 
-        this.foo.bar = 0; // Специально обращаемся к несушествующему свойству для вызова ошибки
+        // this.foo.bar = 0; // Специально обращаемся к несушествующему свойству для вызова ошибки
     };
 
     render() {

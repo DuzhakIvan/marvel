@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 
 import AppHeader from "../appHeader/AppHeader";
 import AppBanner from "../appBanner/appBanner";

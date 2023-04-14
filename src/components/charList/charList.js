@@ -1,14 +1,15 @@
 import styled from "styled-components";
 import { Component } from "react";
+import PropTypes from "prop-types";
+import './charList.scss';
+
 import MarvelService from '../../services/MarvelService';
+
+import CharInfo from "../charInfo/charInfo";
+import CharSearch from "../charSearch/charSearch";
 import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
-
-import './charList.scss';
-import CharInfo from "../charInfo/charInfo";
-import CharSearch from "../charSearch/charSearch";
-import Button from "../button/button";
 
 const Wrapper = styled.div`
     margin-top: 44px;
@@ -40,7 +41,10 @@ class CharList extends Component {
         charList: [],
         loading: true,
         error: false,
-        selectedChar: null
+        selectedChar: null,
+        newItemLoading: false,
+        offset: 210,
+        charEnded: false
     }
 
     onCharSelected = (id) => {
@@ -52,18 +56,54 @@ class CharList extends Component {
     marvelService = new MarvelService();
 
     componentDidMount() {
-        this.marvelService.getAllCharacters()
+        this.onRequest(); // Формируем список персонажей при первом монтировании и последующих вызовах
+        window.addEventListener("scroll", this.onScroll); // Ставим обработчик события при каждом монтировании
+      }
+     
+      componentWillUnmount() {
+        window.removeEventListener("scroll", this.onScroll); // убираем обработчик события при размонтировании (удалении компонента из DOM)
+      }
+     
+      onScroll = () => { // Функция для отпработки события про скроле всей страницы (window)
+        if (this.state.newItemLoading) return; // Если состоянии загрузки элемента (идет связь с сервером и добавляются новые элементы) возвращаем работу функции, чтобы не срабатывала много раз
+        if (this.state.charEnded) // Если состояние (персонажи закончились) снимается слушатель события
+          window.removeEventListener("scroll", this.onScroll); // обработчик события
+     
+        if (window.innerHeight + window.scrollY + 50 >= document.body.offsetHeight) { // Если высота видимого окна браузера + высота проскроленной страницы + отступ >= всей высоте тела документа
+          this.onCharListLoading(); // Запускаем функцию которая переводит компонент в состояние загрузки
+          this.onRequest(this.state.offset); // Вызываем функцию обновления запроса списка персонажей
+        }
+      };
+
+
+    onRequest = (offset) => {
+        this.onCharListLoading();
+        this.marvelService.getAllCharacters(offset)
             .then(this.onCharListLoaded)
             .catch(this.onError);
 
         
     }
 
-    onCharListLoaded = (charList) => {
+    onCharListLoading = () => {
         this.setState({
-            charList,
-            loading: false
+            newItemLoading: true
         })
+    }
+
+    onCharListLoaded = (newCharList) => { // В функцию передаем новых персонажей (масив)\
+        let ended = false;
+        if (newCharList.length < 9) {
+            ended = true;
+        }
+
+        this.setState(({charList, offset}) => ({ // Обновляем state (диструктуризируем charList из state)
+            charList: [...charList, ...newCharList], // новое значение charList = старое значение + новые персонажи
+            loading: false, // меняем состояние загрузки на false
+            newItemLoading: false, // меняем состояние загрузки на false
+            offset: offset + 9, // изменяем каждый следущий вызов персонажей на +9
+            charEnded: ended
+        }))
     }
 
     onError = () => {
@@ -74,23 +114,24 @@ class CharList extends Component {
     }
 
 
-    renderItems(arr) {
-        const items = arr.map((item => {
-            let imgStyle = {'objectFit' : 'cover'};
-            if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
-                imgStyle = {'objectFit' : 'unset'};  
-        }
 
-        return (
-            <li 
-                className='char__item' 
-                key={item.id}
-                onClick={() => this.onCharSelected(item.id)}>
-                <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-                <div className='char__name'>{item.name}</div>
-            </li>
-        )
-        }));
+    renderItems(arr) {
+            const items =  arr.map((item) => {
+                let imgStyle = {'objectFit' : 'cover'};
+                if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
+                    imgStyle = {'objectFit' : 'unset'};
+                }
+                
+                return (
+                    <li 
+                        className="char__item"
+                        key={item.id}
+                        onClick={() => this.onCharSelected(item.id)}>
+                            <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
+                            <div className="char__name">{item.name}</div>
+                    </li>
+                )
+            });
 
         return (
             <List>
@@ -103,7 +144,7 @@ class CharList extends Component {
 
     render () {
 
-        const {charList, loading, error} = this.state;
+        const {charList, loading, error, newItemLoading, offset, charEnded} = this.state;
         const items = this.renderItems(charList);
 
         const errorMessage = error ? <ErrorMessage/> : null;
@@ -118,7 +159,13 @@ class CharList extends Component {
                         {spinner}
                         {content}
                     </List>
-                    <Button className='button__main' name="load more"/>
+                    <button 
+                        className="button button__main button__long"
+                        disabled={newItemLoading}
+                        style={{'display': charEnded ? 'none' : 'block'}}
+                        onClick={() => this.onRequest(offset)}>
+                        <div className="inner">load more</div>
+                    </button>
                 </ListWrapper>
                 <ErrorBoundary>
                     <CharInfo charId = {this.state.selectedChar}/>
@@ -127,6 +174,11 @@ class CharList extends Component {
             </Wrapper>
         )
     }
+}
+
+
+CharInfo.propTypes = {
+    charId: PropTypes.number,
 }
 
 export default CharList;
