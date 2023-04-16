@@ -113,20 +113,48 @@ class CharList extends Component {
         })
     }
 
+    itemRefs = []; // Создаем пустой массив для формирования ссылок на ДОМ элементы списка персонажей
 
+    setRef = (ref) => { // Создаем метод создания массива ссылок, передаем в качестве аргумента ссылку ref
+        this.itemRefs.push(ref); // пушим ссылку ref, ref создается во время монтирования компонента, поэтому при монтировании нового элемента ref будет перезаписываться, и чтобы сохранить все предыдущие ссылки, мы сохраняем его в массив
+    }
+
+    onFocus = (i)=> { // Создаем метод onFocus, аргумент уникальный id элемента(в данном случае индекс в массиве списка персонажей). Метод отвечает за изменение класса и установке фокуса 
+        this.itemRefs.forEach(item => item.classList.remove('char__item_selected')); // Перебираем каждый элемент массива ссылок ДОМ и убираем класс
+        this.itemRefs[i].classList.add('char__item_selected'); // Добавляем к элементу[индекс] класс
+        this.itemRefs[i].focus(); // Устанавливаем фокус на элемент[индекс]
+    }
 
     renderItems(arr) {
-            const items =  arr.map((item) => {
+            const items =  arr.map((item, i) => {
                 let imgStyle = {'objectFit' : 'cover'};
                 if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
                     imgStyle = {'objectFit' : 'unset'};
                 }
                 
+
                 return (
                     <li 
                         className="char__item"
                         key={item.id}
-                        onClick={() => this.onCharSelected(item.id)}>
+                        onClick={() => {
+                            // Запускаем функции передаем айди и индекс массива
+                            this.onCharSelected(item.id)
+                            this.onFocus(i);
+                        }}
+                        // Создаем ref ссылку на элемент DOM
+                        ref={this.setRef} 
+                        // Доьавляем tabIndex чтобы работало переключение по ТАБ
+                        tabIndex='0'
+                        // Добавляем событие по кнопке, если пробел или ентер
+                        onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === "Enter") {
+                                // Запускаем функции передаем айди и индекс массива
+                                e.preventDefault();
+                                this.onCharSelected(item.id);
+                                this.onFocus(i);
+                            }
+                        }}>
                             <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
                             <div className="char__name">{item.name}</div>
                     </li>
