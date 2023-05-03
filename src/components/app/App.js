@@ -10,21 +10,20 @@ import SingleChar from "../singleChar/singleChar";
 import SingleComic from "../singleComic/singleComic";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
-class App extends Component {
+const App = () => {
 
-    render() {
-        return (
-            <div className="app">
-                <AppHeader />
-                <main>
-                    <RandomChar />
-                    <ErrorBoundary>
-                        <CharList />
-                    </ErrorBoundary>
-                </main>
-            </div>
-        );
-    }
+    return (
+        <div className="app">
+            <AppHeader />
+            <main>
+                <RandomChar />
+                <ErrorBoundary>
+                    <CharList />
+                </ErrorBoundary>
+            </main>
+        </div>
+    );
 }
+
 
 export default App;

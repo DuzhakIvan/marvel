@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import MarvelService from '../../services/MarvelService';
 import styled from 'styled-components';
 
@@ -74,58 +74,45 @@ const TryBlock = styled.div`
     }
 `;
 
-class RandomChar extends Component {
-    state = { // Формируем обьект с нулевыми значениями, для последующего его изменения, так как нам не надо хранить его предыдущие данные то создаем его вне конструктора
-        char: {}, // Пустой обьект персонажа куда запишем пришедшие данные с сервера
-        loading: true, // Переменная для отслеживания состояния загрузки для спиннера
-        error: false // состояние ошибки
+const RandomChar = () => {
+
+    const [char, setChar] = useState({}); // Пустой обьект персонажа куда запишем пришедшие данные с сервера
+    const [loading, setLoading] = useState(true); // Переменная для отслеживания состояния загрузки для спиннера
+    const [error, setError] = useState(false); // состояние ошибки
+
+    useEffect(() => {
+        updateChar();
+    }, []);
+
+    const marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
+
+    const onCharLoaded = (char) => {
+        setChar(char);
+        setLoading(false);
     }
 
-    componentDidMount() {
-        this.updateChar();
+    const onCharLoading = () => {
+        setLoading(true);
     }
 
-    marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
-
-    onCharLoaded = (char) => {
-        this.setState({
-            char,   // В обьект state записываем данные из обьекта char
-            loading: false // Меняем значение состояния загрузки персонажей с сервера
-        }); 
+    const onError = () => {
+        setError(true);
+        setLoading(false);
     }
 
-    onCharLoading = () => {
-        this.setState({
-            loading: true
-        })
-    }
-
-    onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        })
-    }
-
-    updateChar = () => { // Функция получения данных с сервера
+    const updateChar = () => { // Функция получения данных с сервера
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // Получаем случайное id для формирования обьекта персонажа
-        this.onCharLoading(); // Когда обновляется случайный персонаж, перед запросом на сервер
+        onCharLoading(); // Когда обновляется случайный персонаж, перед запросом на сервер
 
-        this.marvelService
+        marvelService
             .getCharacter(id) // Метод получение данных персонажа по id
-            .then(this.onCharLoaded) // Вызываем метод для записи обьекта персонажа с сервера в обьект state
-            .catch(this.onError); 
+            .then(onCharLoaded) // Вызываем метод для записи обьекта персонажа с сервера в обьект state
+            .catch(onError); 
     }
 
-    
-
-   render () {
-
-    const {char, loading, error} = this.state;
     const errorMessage = error ? <ErrorMessage/> : null;
     const spinner = loading ? <Spinner/> : null;
     const content = !(loading || error) ? <View char={char}/> : null;
-
 
     return (
         <Wrapper>
@@ -140,14 +127,13 @@ class RandomChar extends Component {
                 </p>
                 <br/>
                 <p>Or choose another one</p>
-                <button onClick={this.updateChar} className="button button__main">
+                <button onClick={updateChar} className="button button__main">
                     <div className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt=""/>
             </TryBlock>
         </Wrapper>
     )
-   }
 }
 
 // Отдельный компонент

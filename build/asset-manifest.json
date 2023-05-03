@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.80473002.css",
-    "main.js": "/static/js/main.8c074900.js",
+    "main.js": "/static/js/main.6ad21001.js",
     "static/media/x-men.png": "/static/media/x-men.41b39e1944f148b7a123.png",
     "static/media/vision.png": "/static/media/vision.96cbe09bed67b0d04328.png",
     "static/media/thor.jpg": "/static/media/thor.8e1ecf9a7b00dd9d291d.jpg",
@@ -10,10 +10,10 @@
     "static/media/Avengers_logo.png": "/static/media/Avengers_logo.9eaf219344d83362e830.png",
     "index.html": "/index.html",
     "main.80473002.css.map": "/static/css/main.80473002.css.map",
-    "main.8c074900.js.map": "/static/js/main.8c074900.js.map"
+    "main.6ad21001.js.map": "/static/js/main.6ad21001.js.map"
   },
   "entrypoints": [
     "static/css/main.80473002.css",
-    "static/js/main.8c074900.js"
+    "static/js/main.6ad21001.js"
   ]
 }
