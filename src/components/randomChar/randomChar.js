@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import styled from 'styled-components';
 
 import Button from "../button/button";
@@ -77,37 +77,27 @@ const TryBlock = styled.div`
 const RandomChar = () => {
 
     const [char, setChar] = useState({}); // Пустой обьект персонажа куда запишем пришедшие данные с сервера
-    const [loading, setLoading] = useState(true); // Переменная для отслеживания состояния загрузки для спиннера
-    const [error, setError] = useState(false); // состояние ошибки
+    const {loading, error, getCharacter, clearError} = useMarvelService(); // Деструтуризируем результат функции сервис
 
     useEffect(() => {
         updateChar();
-    }, []);
+        const timerId = setInterval(updateChar, 30000);
 
-    const marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
+        return () => {
+            clearInterval(timerId)
+        }
+    }, []);
 
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false);
-    }
-
-    const onCharLoading = () => {
-        setLoading(true);
-    }
-
-    const onError = () => {
-        setError(true);
-        setLoading(false);
     }
 
     const updateChar = () => { // Функция получения данных с сервера
-        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // Получаем случайное id для формирования обьекта персонажа
-        onCharLoading(); // Когда обновляется случайный персонаж, перед запросом на сервер
+        clearError(); // Перед каждым запросом сбрасываем ошибку, если она есть, так как она не дает прогружаться контенту
 
-        marvelService
-            .getCharacter(id) // Метод получение данных персонажа по id
+        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // Получаем случайное id для формирования обьекта персонажа
+        getCharacter(id) // Метод получение данных персонажа по id
             .then(onCharLoaded) // Вызываем метод для записи обьекта персонажа с сервера в обьект state
-            .catch(onError); 
     }
 
     const errorMessage = error ? <ErrorMessage/> : null;

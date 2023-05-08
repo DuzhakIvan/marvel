@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Skeleton from "../skeleton/Skeleton";
@@ -63,10 +63,7 @@ const List = styled.ul`
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null); // Пустой обьект персонажа куда запишем пришедшие данные с сервера
-    const [loading, setLoading] = useState(false); // Переменная для отслеживания состояния загрузки для спиннера
-    const [error, setError] = useState(false); // состояние ошибки
-
-    const marvelService = new MarvelService(); // Создаем новый экземпляр ображения к серверу в виде метода
+    const {loading, error, getCharacter} = useMarvelService();
 
     useEffect( () => {
         updateChar();
@@ -75,18 +72,6 @@ const CharInfo = (props) => {
     // Функция перезаписывания обьекта char, после получения его в аргумент  
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false);
-    };
-
-    // Метод который устанавливает состояние загрузки для компонента, если true то прогружается spinner
-    const onCharLoading = () => {
-        setLoading(true);
-    };
-
-    // Метод который устанавливает состояние ошибки для компонента
-    const onError = () => {
-        setError(true);
-        setLoading(false);
     };
 
     // Метод обновления обьекта state
@@ -96,12 +81,8 @@ const CharInfo = (props) => {
             return;
         }
 
-        onCharLoading(); // Так как мы пытаемся связаться с сервером, меняем состояние на loading, чтобы показать пользователю, что идет попытка связи
-
-        marvelService // вызываем метод связи с сервером
-            .getCharacter(charId) // запрашиваем данные по ID обьекта
+        getCharacter(charId) // запрашиваем данные по ID обьекта
             .then(onCharLoaded) // Полученные данные с сервера (promise) передаем в функцию 
-            .catch(onError); // в случае ошибки вызываем функцию onError и передаем туда данные об ошибке
     };
 
     const skeleton = char || loading || error ? null : <Skeleton />; // Если обьект создан или состояние загрузки, или ошибки - игнорируем / равно <Sceleton/> компоненту

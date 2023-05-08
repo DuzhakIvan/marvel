@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import "./charList.scss";
 
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 
 import CharInfo from "../charInfo/charInfo";
 import CharSearch from "../charSearch/charSearch";
@@ -38,64 +38,69 @@ const ListWrapper = styled.div`
 const CharList = (props) => {
     const [selectedChar, setChar] = useState(null);
     const [charList, setCharList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newItemLoading, setNewItemLoading] = useState(true);
-    const [offset, setOffset] = useState(1540);
+    const [offset, setOffset] = useState(1542);
     const [charEnded, setCharEnded] = useState(false);
 
-    const [listener, setListener] = useState();
+    const {loading, error, getAllCharacters} = useMarvelService();
 
     const onCharSelected = (id) => {
         setChar(id);
     };
 
-    const marvelService = new MarvelService();
+    // useEffect(() => {
+    //     window.addEventListener("scroll",onScroll);
+    // }, []);
+
+    // useEffect(() => { 
+    //     // if (!newItemLoading && charEnded) {
+    //     //     window.removeEventListener('scroll', onScroll);
+    //     // }
+
+    //     // if (newItemLoading && !charEnded) {
+    //     //     onRequest(offset, true);
+    //     // }
+
+    // }, [newItemLoading]);
+
+    // useEffect(() => {
+    //     onRequest(offset, true);
+    // }, []);
 
     useEffect(() => {
         window.addEventListener("scroll",onScroll);
     }, []);
 
-    useEffect(() => { 
-        if (!newItemLoading && charEnded) {
-            window.removeEventListener('scroll', onScroll);
+    useEffect(()=> {
+        if (newItemLoading && !loading && !charEnded) {
+            onRequest(offset, true);
         }
 
-        if (newItemLoading && !charEnded) {
-            onRequest(offset);
-        }
-    }, [newItemLoading]);
+        if(!charEnded) {
+            window.addEventListener("scroll",onScroll);
+        } 
+    }, [newItemLoading, ])
 
-    const onRequest = (offset) => {
-        onCharListLoading();
-        marvelService
-            .getAllCharacters(offset)
+    const onRequest = (offset, initial) => { // Добавляем дополнительный аргумент initial, чтобы знать первичная ли это загрузка
+        initial ? setNewItemLoading(false) : setNewItemLoading(true) // И проверяем первая загрузка? 
+
+        getAllCharacters(offset)
             .then(onCharListLoaded)
-            .catch(onError)
             .finally(() => setNewItemLoading(() => false))
-    };
-
-    const onCharListLoading = () => {
-        setNewItemLoading(() => true)
     };
 
     const onScroll = () => {
         if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
             setNewItemLoading(true);
+            window.removeEventListener("scroll",onScroll);
         }
     }
 
     const onCharListLoaded = (newCharList) => {
         // В функцию передаем новых персонажей (масив)\
         setCharList((charList) => [...charList, ...newCharList]); // новое значение charList = старое значение + новые персонажи
-        setLoading((loading) => false); // меняем состояние загрузки на false
         setOffset((offset) => offset + 9); // изменяем каждый следущий вызов персонажей на +9
         setCharEnded(newCharList.length < 9 ? true : false);
-    };
-
-    const onError = () => {
-        setError(true);
-        setLoading(false);
     };
 
     const itemRefs = useRef([]); // Создаем пустой массив для формирования ссылок на ДОМ элементы списка персонажей
@@ -158,8 +163,7 @@ const CharList = (props) => {
     const items = renderItems(charList);
 
     const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    const content = !(loading || error) ? items : null;
+    const spinner = loading && !newItemLoading ? <Spinner /> : null;
 
     return (
         <Wrapper>
@@ -167,7 +171,7 @@ const CharList = (props) => {
                 <List>
                     {errorMessage}
                     {spinner}
-                    {content}
+                    {items}
                 </List>
                 <button
                     className="button button__main button__long"
