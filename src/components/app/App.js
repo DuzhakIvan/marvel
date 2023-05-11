@@ -1,31 +1,32 @@
-import { Component } from "react";
-
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom/cjs/react-router-dom.min";
 import AppHeader from "../appHeader/AppHeader";
-import AppBanner from "../appBanner/appBanner";
-import ComicsList from "../comicsList/comicsList";
-import RandomChar from "../randomChar/randomChar";
-import CharList from "../charList/charList";
-import decoration from "../../resources//img/vision.png";
+import {MainPage, ComicsPage} from '../pages'; // Когда указываешь просто папку, webPack пытается найти файл index.js автоматически
 import SingleChar from "../singleChar/singleChar";
 import SingleComic from "../singleComic/singleComic";
-import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 const App = () => {
 
     return (
-        <div className="app">
-            <AppHeader />
-            <main>
-                <AppBanner/>
-                <ErrorBoundary>
-                    <ComicsList/>
-                </ErrorBoundary>    
-                {/* <RandomChar />
-                <ErrorBoundary>
-                    <CharList />
-                </ErrorBoundary> */}
-            </main>
-        </div>
+        <Router>
+            <div className="app">
+                <AppHeader/>
+                <main>
+                    <Switch>
+                        {/* атрибут exact - говорим, что нужно точное сопадение пути
+                            атрибут path - ссылка на страницу
+                            компонент switch - нужен для переходов
+                            компонент Router - где работают Route и Switch
+                            компонент Route (BrowserRouter) - разделяет на страницы для переключения */}
+                        <Route exact path="/">
+                            <MainPage/>
+                        </Route>
+                        <Route exact path="/comics">
+                           <ComicsPage/>
+                        </Route>
+                    </Switch>
+                </main>
+            </div>
+        </Router>
     );
 }
 

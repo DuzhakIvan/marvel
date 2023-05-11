@@ -1,3 +1,4 @@
+import { NavLink, Link } from 'react-router-dom/cjs/react-router-dom';
 import styled from 'styled-components';
 
 const Header = styled.header`
@@ -44,15 +45,20 @@ const AppHeader = () => {
     return (
         <Header>
             <Title>
-                <a>
+                <Link to='/'>
                     <MainText>Marvel</MainText> information portal
-                </a>
+                </Link>
             </Title>
             <Nav>
                 <ul>
-                    <li><a>Characters</a></li>
+                    {/* компонент Link - типа <a>
+                        компонент NavLink - дополнительные атрибуты
+                        атрибут to - типа href 
+                        exact - точное совпадение по ссылкам to
+                        activeStyle - если есть совпадение по to */}
+                    <li><NavLink exact activeStyle={{'color' : '#9f0013'}}  to='/'>Characters</NavLink></li>
                     <Slesh>/</Slesh>
-                    <li><a>Comics</a></li>
+                    <li><NavLink exact activeStyle={{'color' : '#9f0013'}} to='/comics'>Comics</NavLink></li>
                 </ul>
             </Nav>
         </Header>
