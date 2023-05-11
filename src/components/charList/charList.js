@@ -42,30 +42,11 @@ const CharList = (props) => {
     const [offset, setOffset] = useState(1542);
     const [charEnded, setCharEnded] = useState(false);
 
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {loading, error, getAllCharacters, getAllComics} = useMarvelService();
 
     const onCharSelected = (id) => {
         setChar(id);
     };
-
-    // useEffect(() => {
-    //     window.addEventListener("scroll",onScroll);
-    // }, []);
-
-    // useEffect(() => { 
-    //     // if (!newItemLoading && charEnded) {
-    //     //     window.removeEventListener('scroll', onScroll);
-    //     // }
-
-    //     // if (newItemLoading && !charEnded) {
-    //     //     onRequest(offset, true);
-    //     // }
-
-    // }, [newItemLoading]);
-
-    // useEffect(() => {
-    //     onRequest(offset, true);
-    // }, []);
 
     useEffect(() => {
         window.addEventListener("scroll",onScroll);
@@ -79,7 +60,7 @@ const CharList = (props) => {
         if(!charEnded) {
             window.addEventListener("scroll",onScroll);
         } 
-    }, [newItemLoading, ])
+    }, [newItemLoading])
 
     const onRequest = (offset, initial) => { // Добавляем дополнительный аргумент initial, чтобы знать первичная ли это загрузка
         initial ? setNewItemLoading(false) : setNewItemLoading(true) // И проверяем первая загрузка? 

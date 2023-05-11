@@ -19,6 +19,10 @@ const useMarvelService = () => {
         return _transformCharacter(res.data.results[0]); // Возвращаем уже трансформированный обьект
     }
 
+    const getAllComics = async (offset = 8) => {
+        const res = await request(`${_apiBase}comics?limit=8&offset=${offset}&${_apiKey}`);
+        return res.data.results.map(_transformComics);
+    }
     // Создаем метод трансформации данных
 
     const _transformCharacter = (char) => { // в аргумент передадим путь нужным данным в обьекте
@@ -44,8 +48,20 @@ const useMarvelService = () => {
         }
     }
 
+    const _transformComics = (comic) => {
+        return {
+            id: comic.id,
+            title: comic.title,
+            description: (comic.description ? comic.description : "No description for this comic("),
+            pages: comic.pageCount,
+            thumbnail: comic.thumbnail.path + '.' + comic.thumbnail.extension,
+            price: (comic.prices[0].price ? comic.prices[0].price : 'not available'),
+            languages: (comic.textObjects[0] ? comic.textObjects[0].language : 'not available'),
+        }
+    }
+
     // Будем возвращать сущности из этой функции
-    return {loading, error, getAllCharacters, getCharacter, clearError}
+    return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics}
 }
 
 export default useMarvelService;

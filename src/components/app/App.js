@@ -16,10 +16,14 @@ const App = () => {
         <div className="app">
             <AppHeader />
             <main>
-                <RandomChar />
+                <AppBanner/>
+                <ErrorBoundary>
+                    <ComicsList/>
+                </ErrorBoundary>    
+                {/* <RandomChar />
                 <ErrorBoundary>
                     <CharList />
-                </ErrorBoundary>
+                </ErrorBoundary> */}
             </main>
         </div>
     );
