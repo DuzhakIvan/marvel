@@ -24,9 +24,9 @@ const App = () => {
                                 компонент switch - нужен для переходов
                                 компонент Router - где работают Route и Switch
                                 компонент Route (BrowserRouter) - разделяет на страницы для переключения */}
-                            <Route path="/" element ={<MainPage/>} />
-                            <Route path="/comics" element ={<ComicsPage/>}/>
-                            <Route path="/comics/:comicId" element = {<SingleComicPage/>}/>
+                            <Route end path={'/'} element ={<MainPage/>} />
+                            <Route end path="/comics" element ={<ComicsPage/>}/>
+                            <Route end path="/comics/:comicId" element = {<SingleComicPage/>}/>
                             <Route path="*" element={<Page404/>} />
                         </Routes>
                     </Suspense>
