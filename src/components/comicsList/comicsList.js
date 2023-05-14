@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/spinner';
 import "./comicsList.scss";
@@ -61,18 +62,17 @@ const ComicsList = (props) => {
 
             return (
                 <li className='comics__item' key={i} id={item.id}>
-                    <a href="#">
+                    <Link to={`./${item.id}`}>
                         <img src={item.thumbnail} style={imgStyle} alt={item.title} />
                         <span className='comics__item__title'>{item.title}</span>
                         <span className="comics__item__price">{item.price}</span>
-                    </a>
+                    </Link>
                 </li>
             )
         })
 
         return <ul className='comics__list'>{items}</ul>
     } 
-    console.log('render');
 
     const items = renderItems(comicsList);
     const errorMessage = error ? <ErrorMessage /> : null;

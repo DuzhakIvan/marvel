@@ -1,4 +1,4 @@
-import { NavLink, Link } from 'react-router-dom/cjs/react-router-dom';
+import { NavLink, Link } from "react-router-dom";
 import styled from 'styled-components';
 
 const Header = styled.header`
@@ -54,11 +54,12 @@ const AppHeader = () => {
                     {/* компонент Link - типа <a>
                         компонент NavLink - дополнительные атрибуты
                         атрибут to - типа href 
-                        exact - точное совпадение по ссылкам to
-                        activeStyle - если есть совпадение по to */}
-                    <li><NavLink exact activeStyle={{'color' : '#9f0013'}}  to='/'>Characters</NavLink></li>
+                        exact/end - точное совпадение по ссылкам to
+                        activeStyle/  ({isActive}) => ({color: isActive ? '#9f0013' : 'inherit'})} - если есть совпадение по to 
+                        */}
+                    <li><NavLink end style={ ({isActive}) => ({color: isActive ? '#9f0013' : 'inherit'})}  to='/'>Characters</NavLink></li>
                     <Slesh>/</Slesh>
-                    <li><NavLink exact activeStyle={{'color' : '#9f0013'}} to='/comics'>Comics</NavLink></li>
+                    <li><NavLink style={ ({isActive}) => ({color: isActive ? '#9f0013' : 'inherit'})} to='/comics'>Comics</NavLink></li>
                 </ul>
             </Nav>
         </Header>

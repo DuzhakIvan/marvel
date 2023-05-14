@@ -1,0 +1,8 @@
+{
+    "routes": [
+      { "src": "/", "dest": "/" },
+      { "src": "/comics", "dest": "/" },
+      { "src": "/comics/:comicId", "dest": "/" },
+      { "src": "*", "dest": "/" }
+    ]
+}

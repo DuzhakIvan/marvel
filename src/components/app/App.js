@@ -1,8 +1,14 @@
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom/cjs/react-router-dom.min";
+import { lazy, Suspense } from "react";
+import { BrowserRouter as Router, Routes, Route  } from "react-router-dom";
 import AppHeader from "../appHeader/AppHeader";
-import {MainPage, ComicsPage} from '../pages'; // Когда указываешь просто папку, webPack пытается найти файл index.js автоматически
-import SingleChar from "../singleChar/singleChar";
-import SingleComic from "../singleComic/singleComic";
+import Spinner from "../spinner/spinner";
+// import {MainPage, ComicsPage, SingleComicPage} from '../pages'; // Когда указываешь просто папку, webPack пытается найти файл index.js автоматически
+
+const Page404 = lazy(() => import('../pages/404'))
+const MainPage = lazy(() => import('../pages/MainPage'));
+const ComicsPage = lazy(() => import('../pages/ComicsPage'));
+const SingleComicPage = lazy(() => import('../pages/SingleComicPage'));
+
 
 const App = () => {
 
@@ -11,19 +17,19 @@ const App = () => {
             <div className="app">
                 <AppHeader/>
                 <main>
-                    <Switch>
-                        {/* атрибут exact - говорим, что нужно точное сопадение пути
-                            атрибут path - ссылка на страницу
-                            компонент switch - нужен для переходов
-                            компонент Router - где работают Route и Switch
-                            компонент Route (BrowserRouter) - разделяет на страницы для переключения */}
-                        <Route exact path="/">
-                            <MainPage/>
-                        </Route>
-                        <Route exact path="/comics">
-                           <ComicsPage/>
-                        </Route>
-                    </Switch>
+                    <Suspense fallback={<Spinner/>}>
+                        <Routes>
+                            {/* атрибут exact - говорим, что нужно точное сопадение пути
+                                атрибут path - ссылка на страницу
+                                компонент switch - нужен для переходов
+                                компонент Router - где работают Route и Switch
+                                компонент Route (BrowserRouter) - разделяет на страницы для переключения */}
+                            <Route path="/" element ={<MainPage/>} />
+                            <Route path="/comics" element ={<ComicsPage/>}/>
+                            <Route path="/comics/:comicId" element = {<SingleComicPage/>}/>
+                            <Route path="*" element={<Page404/>} />
+                        </Routes>
+                    </Suspense>
                 </main>
             </div>
         </Router>
