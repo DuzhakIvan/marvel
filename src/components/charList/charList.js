@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import "./charList.scss";
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import useMarvelService from "../../services/MarvelService";
 
@@ -39,7 +40,7 @@ const CharList = (props) => {
     const [selectedChar, setChar] = useState(null);
     const [charList, setCharList] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(true);
-    const [offset, setOffset] = useState(1542);
+    const [offset, setOffset] = useState(250);
     const [charEnded, setCharEnded] = useState(false);
 
     const {loading, error, getAllCharacters, getAllComics} = useMarvelService();
@@ -71,7 +72,7 @@ const CharList = (props) => {
     };
 
     const onScroll = () => {
-        if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        if (window.innerHeight + window.pageYOffset + 20 >= document.body.offsetHeight) {
             setNewItemLoading(true);
             window.removeEventListener("scroll",onScroll);
         }
@@ -106,39 +107,43 @@ const CharList = (props) => {
             }
 
             return (
-                <li
-                    className="char__item"
-                    key={item.id}
-                    onClick={() => {
-                        // Запускаем функции передаем айди и индекс массива
-                        onCharSelected(item.id);
-                        onFocus(i);
-                    }}
-                    // Создаем ref ссылку на элемент DOM
-                    ref={(el) => (itemRefs.current[i] = el)}
-                    // Доьавляем tabIndex чтобы работало переключение по ТАБ
-                    tabIndex="0"
-                    // Добавляем событие по кнопке, если пробел или ентер
-                    onKeyDown={(e) => {
-                        if (e.key === " " || e.key === "Enter") {
+                <CSSTransition
+                key={item.id}
+                    timeout={500}
+                    classNames="char__item">
+                    <li
+                        className="char__item"
+                        onClick={() => {
                             // Запускаем функции передаем айди и индекс массива
-                            e.preventDefault();
                             onCharSelected(item.id);
                             onFocus(i);
-                        }
-                    }}
-                >
-                    <img
-                        src={item.thumbnail}
-                        alt={item.name}
-                        style={imgStyle}
-                    />
-                    <div className="char__name">{item.name}</div>
-                </li>
+                        }}
+                        // Создаем ref ссылку на элемент DOM
+                        ref={(el) => (itemRefs.current[i] = el)}
+                        // Доьавляем tabIndex чтобы работало переключение по ТАБ
+                        tabIndex="0"
+                        // Добавляем событие по кнопке, если пробел или ентер
+                        onKeyDown={(e) => {
+                            if (e.key === " " || e.key === "Enter") {
+                                // Запускаем функции передаем айди и индекс массива
+                                e.preventDefault();
+                                onCharSelected(item.id);
+                                onFocus(i);
+                            }
+                        }}
+                    >
+                        <img
+                            src={item.thumbnail}
+                            alt={item.name}
+                            style={imgStyle}
+                        />
+                        <div className="char__name">{item.name}</div>
+                    </li>
+                </CSSTransition>
             );
         });
 
-        return <List>{items}</List>;
+        return <List><TransitionGroup component={null}>{items}</TransitionGroup></List>;
     }
 
     const items = renderItems(charList);
