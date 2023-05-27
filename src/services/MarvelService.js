@@ -28,8 +28,15 @@ const useMarvelService = () => {
         const res = await request(`${_apiBase}comics?limit=8&offset=${offset}&${_apiKey}`);
         return res.data.results.map(_transformComics);
     }
-    // Создаем метод трансформации данных
+ 
+    // Получение обьекта персонажа по имени персонажа (В API есть такая возможность)
+	const getCharacterByName = async (name) => {
+		const res = await request(`${_apiBase}characters?name=${name}&${_apiKey}`);
+		return res.data.results.map(_transformCharacter);
+	};
 
+
+   // Создаем метод трансформации данных
     const _transformCharacter = (char) => { // в аргумент передадим путь нужным данным в обьекте
         return {
             id: char.id, // Айди важный параметр для работы, передаем потом в качестве пропсов компонентам
@@ -66,7 +73,7 @@ const useMarvelService = () => {
     }
 
     // Будем возвращать сущности из этой функции
-    return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getComic}
+    return {loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getComic, getCharacterByName}
 }
 
 export default useMarvelService;
