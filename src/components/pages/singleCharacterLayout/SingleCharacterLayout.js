@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet';
 import './singleCharacterLayout.scss'
 // Здесь формируем струтуру страницы персонажа (Component)
 // Мы будем передавать этот компонент в качестве пропсов в SinglePage
@@ -7,6 +8,10 @@ const SingleCharacterLayout = ({data}) => { // в качестве props пер�
 
     return (
         <div className='single-comic'>
+            <Helmet>
+                <meta name="description" content={`Character ${name} `}/> 
+                <title>{name}</title>
+            </Helmet>
             <img src={thumbnail} alt={name} className='single-comic__char-img'/>
             <div className='single-comic__info'>
                 <h2 className='single-comic__name'>{name}</h2>
