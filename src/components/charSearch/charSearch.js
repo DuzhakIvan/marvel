@@ -10,7 +10,7 @@ import "./charSearch.scss"
 
 const CharSearch = () => {
     const [char, setChar] = useState(null); // Сюда помещаем обьект персонажа после поиска формы,
-    const {loading, error, getCharacterByName, clearError} = useMarvelService();
+    const {loading, error, getCharacterByName, clearError, process, setProcess} = useMarvelService();
 
     const onCharLoaded = (char) => { // Отдельный метод по обновлению обьекта персонажа
         setChar(char);
@@ -20,10 +20,11 @@ const CharSearch = () => {
         clearError(); // Сьрос ошибки при связи с сервером
 
         getCharacterByName(name) // Поолучение обьекта персонажа по имени с сервера
-            .then(onCharLoaded); // Записываем результат промиса с сервера в состояние char
+            .then(onCharLoaded) // Записываем результат промиса с сервера в состояние char
+            .then(() => setProcess('confirmed'));
     }
 
-    const errorMessage = error ? <div><ErrorMessage/></div> : null; // Если есть ощибка, равно Компоненту ошибки, нет - ничего
+    const errorMessage = process === 'error' ? <div><ErrorMessage/></div> : null; // Если есть ощибка, равно Компоненту ошибки, нет - ничего
 
     const results = !char ? null : char.length > 0 ? // результат равен если char undefined (true) то null, если char длина больше 0, то возвращаем структуру (успех)
                         <div className='search__sucсess'>
@@ -58,7 +59,7 @@ const CharSearch = () => {
                     <label htmlFor='charName'>Or find a character by name:</label>
                     <div className="input__wraper">
                         <Field type="text" placeholder="Enter name" id='charName' name='charName'/>
-                        <button type='submit' className="button button__main" disabled={loading}>
+                        <button type='submit' className="button button__main" disabled={process === 'loading'}>
                             <div className="inner">find</div>
                         </button>
                     </div>

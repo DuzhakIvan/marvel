@@ -4,9 +4,9 @@ import styled from 'styled-components';
 
 import Button from "../button/button";
 import mjolnir from "../../resources/img/mjolnir.png";
-import Spinner from '../spinner/spinner.js';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-
+// import Spinner from '../spinner/spinner.js';
+// import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 const Wrapper = styled.div`
     display: flex;
@@ -77,7 +77,7 @@ const TryBlock = styled.div`
 const RandomChar = () => {
 
     const [char, setChar] = useState({}); // Пустой обьект персонажа куда запишем пришедшие данные с сервера
-    const {loading, error, getCharacter, clearError} = useMarvelService(); // Деструтуризируем результат функции сервис
+    const {loading, error, getCharacter, clearError, process, setProcess} = useMarvelService(); // Деструтуризируем результат функции сервис
 
     useEffect(() => {
         updateChar();
@@ -98,19 +98,22 @@ const RandomChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // Получаем случайное id для формирования обьекта персонажа
         getCharacter(id) // Метод получение данных персонажа по id
             .then(onCharLoaded) // Вызываем метод для записи обьекта персонажа с сервера в обьект state
+            .then(() => setProcess('confirmed'))
     }
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error) ? <View char={char}/> : null;
+    // const errorMessage = error ? <ErrorMessage/> : null;
+    // const spinner = loading ? <Spinner/> : null;
+    // const content = !(loading || error) ? <View char={char}/> : null;
 
     return (
         <Wrapper>
-            {/*loading ? <Spinner/> : <View char={char}/> /* Если состояние загрузки ТРУ загрузится вернет Спиннер, ФОЛС - компонент  View */}
+            {/* loading ? <Spinner/> : <View char={char}/> /* Если состояние загрузки ТРУ загрузится вернет Спиннер, ФОЛС - компонент  View */}
 
-            {errorMessage /* Если не null отобразит компонент */}
-            {spinner /* Если не null отобразит компонент */}
-            {content /* Если не null отобразит компонент */}
+            {/* {errorMessage /* Если не null отобразит компонент } */}
+            {/* {spinner /* Если не null отобразит компонент } */}
+            {/* {content /* Если не null отобразит компонент } */}
+
+            {setContent(process, View, char)}
             <TryBlock>
                 <p>Random character for today!<br/>
                    Do you want to get to know him better?
@@ -127,8 +130,8 @@ const RandomChar = () => {
 }
 
 // Отдельный компонент
-const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki} = char;
+const View = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki} = data;
     const style = thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? {objectFit: 'contain'} : {objectFit: 'cover'};
 
     return (

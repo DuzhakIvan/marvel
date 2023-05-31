@@ -6,6 +6,7 @@ export const useHttp = () => { // use - говорит, что это хук. ht
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [process, setProcess] = useState('waiting'); // создаем дополнительное состояние для принципа конечного автомата, само состояние импортируем
 
 // так как это связть с сервером тут должен происходить запрос
 
@@ -18,7 +19,7 @@ export const useHttp = () => { // use - говорит, что это хук. ht
                           ) => { 
 
                                 setLoading(true); // Перед отправкой запроса ставим статус загрузки
-
+                                setProcess('loading'); // Переключаем состояние FMS
                                 try { // делаем попытку запроса на сервер
                                     const response = await fetch(url, {method, body, headers}); // создаем переменную, куда записываем ответ от сервера с заданным аргуменами адресса и обьектом настроек
 
@@ -28,17 +29,22 @@ export const useHttp = () => { // use - говорит, что это хук. ht
 
                                     const data = await response.json(); // записываем в переменную ответ от сервера конвертировав его из json
                                     setLoading(false); // Меняем статус загрузки
+                                    // setProcess('confirmed'); // Переключаем состояние FMS - из-за ассинхронсти когда (связь с сервером), установку данного состояния необходимо перенести в момент когда данные загружены (charInfo.js), если оставить - будет ошибка
                                     return data; // Функция вернет данные полученные от сервера
                                 } catch(e) { // Блок ошибки
                                     setLoading(false); // Статус загрузки завершился (ошибкой)
                                     setError(e.message); // Меняем состояние ошибки и он будет равен не null, а текст ошибки
+                                    setProcess('error'); // Переключаем состояние FMS
                                     throw e; // Выкидываем ошибку
                                 }                         
 
     }, []) 
 
     // Функция чистки от ошибок (сброса)
-    const clearError = useCallback(()=> setError(null), []); // Если с сервера прийдет ошибка (например нет нужного обьекта по айди), то эта функция позволит скинуть ошибку
+    const clearError = useCallback(()=> {
+        setError(null);
+        setProcess('loading'); // Переключаем состояние FMS
+    }, []); // Если с сервера прийдет ошибка (например нет нужного обьекта по айди), то эта функция позволит скинуть ошибку
 
-    return {loading, request, error, clearError}
+    return {loading, request, error, clearError, process, setProcess}
 }

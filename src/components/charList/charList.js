@@ -36,6 +36,27 @@ const ListWrapper = styled.div`
     grid-row: 1 / -1;
 `;
 
+
+// Так как тут логика отличается модифицируем функцию
+const setContent = (process, Component, newItemLoading) => {
+    switch(process) {
+        case 'waiting':
+            return <Spinner/>;
+            break;
+        case "loading": 
+            return newItemLoading ? <Component/> : <Spinner/>;
+            break;
+        case 'confirmed':
+            return <Component/>;
+            break;
+        case 'error':
+            return <ErrorMessage/>;
+            break;
+        default:
+            throw new Error('Unexpected process state');
+    }
+}
+
 const CharList = (props) => {
     const [selectedChar, setChar] = useState(null);
     const [charList, setCharList] = useState([]);
@@ -43,7 +64,7 @@ const CharList = (props) => {
     const [offset, setOffset] = useState(250);
     const [charEnded, setCharEnded] = useState(false);
 
-    const {loading, error, getAllCharacters, getAllComics} = useMarvelService();
+    const {loading, error, getAllCharacters, process, setProcess} = useMarvelService();
 
     const onCharSelected = (id) => {
         setChar(id);
@@ -68,6 +89,7 @@ const CharList = (props) => {
 
         getAllCharacters(offset)
             .then(onCharListLoaded)
+            .then(() => setProcess('confirmed')) // устанавливаем состояние "подтверждено" для FSM  
             .finally(() => setNewItemLoading(() => false))
     };
 
@@ -146,18 +168,20 @@ const CharList = (props) => {
         return <List><TransitionGroup component={null}>{items}</TransitionGroup></List>;
     }
 
-    const items = renderItems(charList);
+    // const items = renderItems(charList);
 
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading && !newItemLoading ? <Spinner /> : null;
+    // const errorMessage = error ? <ErrorMessage /> : null;
+    // const spinner = loading && !newItemLoading ? <Spinner /> : null;
 
     return (
         <Wrapper>
             <ListWrapper>
                 <List>
-                    {errorMessage}
+                    {/* {errorMessage}
                     {spinner}
-                    {items}
+                    {items} */}
+
+                    {setContent(process, () => renderItems(charList), newItemLoading)}
                 </List>
                 <button
                     className="button button__main button__long"

@@ -1,9 +1,13 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import useMarvelService from "../../services/MarvelService";
-import Spinner from "../spinner/spinner";
-import ErrorMessage from "../errorMessage/ErrorMessage";
-import Skeleton from "../skeleton/Skeleton";
+
+import setContent from '../../utils/setContent';
+
+// Данные свойства с испозованием FMS уже не нужны
+// import Spinner from "../spinner/spinner";
+// import ErrorMessage from "../errorMessage/ErrorMessage";
+// import Skeleton from "../skeleton/Skeleton";
 
 import Button from "../button/button";
 
@@ -63,7 +67,7 @@ const List = styled.ul`
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null); // Пустой обьект персонажа куда запишем пришедшие данные с сервера
-    const {loading, error, getCharacter} = useMarvelService();
+    const {loading, error, getCharacter, clearError, process, setProcess} = useMarvelService();
 
     useEffect( () => {
         updateChar();
@@ -83,28 +87,56 @@ const CharInfo = (props) => {
 
         getCharacter(charId) // запрашиваем данные по ID обьекта
             .then(onCharLoaded) // Полученные данные с сервера (promise) передаем в функцию 
+            .then(() => setProcess('confirmed')) // состояние confirmed устанавливаем только тогда, когда данные действительно получены. Так как это ассинхронный процес
     };
 
-    const skeleton = char || loading || error ? null : <Skeleton />; // Если обьект создан или состояние загрузки, или ошибки - игнорируем / равно <Sceleton/> компоненту
-    const errorMessage = error ? <ErrorMessage/> : null; // если состояние error - равен компоненту <ErrorMessage/> / равен ничему
-    const spinner = loading ? <Spinner /> : null; // если состояние загрузки - равен <Spinner/> / равен ничему
-    const content = !(loading || error || !char) ? ( // если не (состояние загрузки / ошибка / обьект создан)
-        <View char={char} />
-    ) : null;
+    // В зависимости от состояния process будем рендерить нужный контент, мы вынесли в отдельный файл данную функцию 
+    // const setContent = (process, char) => {
+    //     switch(process) {
+    //         case 'waiting':
+    //             return <Skeleton/>;
+    //             break;
+    //         case "loading": 
+    //             return <Spinner/>;
+    //             break;
+    //         case 'confirmed':
+    //             return <View char={char} />;
+    //             break;
+    //         case 'error':
+    //             return <ErrorMessage/>;
+    //             break;
+    //         default:
+    //             throw new Error('Unexpected process state');
+    //     }
+    // }
 
     return (
         <BigWrapper>
-            {skeleton}
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, View, char)}
         </BigWrapper>
-    );
+    )
+
+    // Вариант рендеринга нужных копонентов без использования принципа конечного автомата
+    // const skeleton = char || loading || error ? null : <Skeleton />; // Если обьект создан или состояние загрузки, или ошибки - игнорируем / равно <Sceleton/> компоненту
+    // const errorMessage = error ? <ErrorMessage/> : null; // если состояние error - равен компоненту <ErrorMessage/> / равен ничему
+    // const spinner = loading ? <Spinner /> : null; // если состояние загрузки - равен <Spinner/> / равен ничему
+    // const content = !(loading || error || !char) ? ( // если не (состояние загрузки / ошибка / обьект создан)
+    //     <View char={char} />
+    // ) : null;
+
+    // return (
+    //     <BigWrapper>
+    //         {skeleton}
+    //         {errorMessage}
+    //         {spinner}
+    //         {content}
+    //     </BigWrapper>
+    // );
 }
 
 // Дополнительный компонент для разделения логики интерфейса и состояния
-const View = ({ char }) => {
-    const { name, description, thumbnail, homepage, wiki, comics } = char;
+const View = ({ data }) => {
+    const { name, description, thumbnail, homepage, wiki, comics } = data;
 
     const content =
         comics.length === 0 ? ( // Если массив из комиксов пустой
